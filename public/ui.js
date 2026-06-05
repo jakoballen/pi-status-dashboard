@@ -1,10 +1,9 @@
-/* const statusGrid = document.getElementById("statusGrid");
+
+
+// UI layer: responsible only for rendering
+
+const statusGrid = document.getElementById("statusGrid");
 const lastUpdated = document.getElementById("lastUpdated");
-const terminalBtn = document.getElementById("terminalBtn");
-
-let TERMINAL_URL = null;
-
-// -------------------- Config --------------------
 
 const SERVICE_LINKS = {
     "Pi-hole": `${window.location.protocol}//${window.location.hostname}/admin`,
@@ -44,12 +43,14 @@ function getIcon(title) {
     return icons[title] || "📊";
 }
 
-function updateLastCheckedTime() {
+export function updateLastCheckedTime() {
+    if (!lastUpdated) return;
+
     const now = new Date();
     lastUpdated.textContent = `Last updated: ${now.toLocaleString()} (auto-refresh every 30s)`;
 }
 
-// -------------------- UI --------------------
+// -------------------- UI Components --------------------
 
 function createStatusCard(item) {
     const card = document.createElement("article");
@@ -71,10 +72,10 @@ function createStatusCard(item) {
     card.appendChild(value);
     card.appendChild(detail);
 
-    // Clickable service cards
+    // clickable services
     const link = SERVICE_LINKS[item.title];
     if (link) {
-        card.style.cursor = "pointer";
+        card.classList.add("clickable");
 
         const indicator = document.createElement("span");
         indicator.textContent = " ↗";
@@ -92,12 +93,10 @@ function createStatusCard(item) {
 function createSection(title, items) {
     const wrapper = document.createElement("div");
     wrapper.className = "statusSection";
-    
 
     const heading = document.createElement("h2");
-    heading.textContent = title;
     heading.className = "sectionTitle";
-
+    heading.textContent = title;
 
     const grid = document.createElement("div");
     grid.className = "statusGrid";
@@ -112,7 +111,11 @@ function createSection(title, items) {
     return wrapper;
 }
 
-function renderStatusCards(statusItems) {
+// -------------------- Main Render --------------------
+
+export function renderStatusCards(statusItems) {
+    if (!statusGrid) return;
+
     statusGrid.innerHTML = "";
 
     if (!statusItems || statusItems.length === 0) {
@@ -146,100 +149,3 @@ function renderStatusCards(statusItems) {
         statusGrid.appendChild(createSection("Services", serviceItems));
     }
 }
-
-// -------------------- Data --------------------
-
-async function loadTerminalConfig() {
-    try {
-        const res = await fetch("/api/terminal");
-        const data = await res.json();
-        TERMINAL_URL = data.terminalUrl;
-    } catch (err) {
-        console.error("Failed to load terminal config", err);
-    }
-}
-
-async function loadStatusData() {
-    try {
-        const response = await fetch("/api/status");
-
-        if (!response.ok) {
-            throw new Error("Failed to load status data");
-        }
-
-        const statusData = await response.json();
-
-        renderStatusCards(statusData);
-        updateLastCheckedTime();
-    } catch (error) {
-        console.error(error);
-
-        renderStatusCards([
-            {
-                title: "Dashboard Error",
-                value: "Unavailable",
-                detail: "Unable to retrieve status information.",
-                status: "bad"
-            }
-        ]);
-    }
-}
-
-// -------------------- Init --------------------
-
-function setupTerminalButton() {
-    if (!terminalBtn) return;
-
-    terminalBtn.addEventListener("click", () => {
-        if (!TERMINAL_URL) {
-            console.error("TERMINAL_URL not loaded yet");
-            return;
-        }
-
-        window.open(TERMINAL_URL, "_blank");
-    });
-}
-
-async function init() {
-    await loadTerminalConfig();
-    setupTerminalButton();
-    loadStatusData();
-    setInterval(loadStatusData, 30000);
-}
-
-init(); */
-
-import { loadStatusData, loadTerminalConfig } from "./data.js";
-import { renderStatusCards, updateLastCheckedTime } from "./ui.js";
-
-const terminalBtn = document.getElementById("terminalBtn");
-
-let TERMINAL_URL = null;
-
-function setupTerminalButton() {
-    if (!terminalBtn) return;
-
-    terminalBtn.addEventListener("click", () => {
-        if (!TERMINAL_URL) return;
-        window.open(TERMINAL_URL, "_blank");
-    });
-}
-
-async function refresh() {
-    try {
-        const data = await loadStatusData();
-        renderStatusCards(data);
-        updateLastCheckedTime();
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-async function init() {
-    TERMINAL_URL = await loadTerminalConfig();
-    setupTerminalButton();
-    await refresh();
-    setInterval(refresh, 30000);
-}
-
-init();

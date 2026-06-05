@@ -1,5 +1,6 @@
-
-
+/* =========================
+   Base / Reset
+========================= */
 * {
     box-sizing: border-box;
 }
@@ -11,6 +12,9 @@ body {
     color: #e5e5e5;
 }
 
+/* =========================
+   Layout: Header
+========================= */
 header {
     display: flex;
     justify-content: space-between;
@@ -29,33 +33,11 @@ header p {
     margin: 0.25rem 0 0;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .headerRight {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-}
-
-.terminalBtn {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #2d2d2d;
-  color: white;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-family: monospace;
-  letter-spacing: 0.3px;
-}
-
-.terminalBtn:hover {
-  background: #444;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
 }
 
 #lastUpdated {
@@ -63,10 +45,46 @@ header {
     text-align: right;
 }
 
+/* =========================
+   Terminal Button
+========================= */
+.terminalBtn {
+    padding: 6px 12px;
+    border: 1px solid #888;
+    border-radius: 6px;
+    background: #4a4a4a;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: monospace;
+    letter-spacing: 0.3px;
+    transition: background 0.15s ease, border 0.15s ease;
+}
+
+.terminalBtn:hover {
+    background: #505050;
+    border-color: #888;
+}
+
+/* =========================
+   Layout: Main Content
+========================= */
 main {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+}
+
+.statusSection {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+    margin: 1rem 0 0.5rem;
+    font-size: 1.25rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 0.25rem;
 }
 
 .statusGrid {
@@ -80,12 +98,19 @@ main {
     display: block;
 }
 
+/* =========================
+   Cards
+========================= */
 .statusCard {
     background-color: #2b2b2b;
     border: 1px solid #444;
     border-radius: 12px;
     padding: 1rem;
-    transition: transform 0.15s ease;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.statusCard.clickable {
+    cursor: pointer;
 }
 
 .statusCard:hover {
@@ -110,6 +135,9 @@ main {
     margin-bottom: 0;
 }
 
+/* =========================
+   Status Colors
+========================= */
 .good {
     color: #4caf50;
 }
@@ -134,6 +162,9 @@ main {
     border-left: 4px solid #ef5350;
 }
 
+/* =========================
+   Responsive
+========================= */
 @media (max-width: 700px) {
     header {
         flex-direction: column;
