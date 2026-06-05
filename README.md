@@ -8,11 +8,20 @@ A lightweight dashboard for monitoring Raspberry Pi system health and homelab se
 - CPU temperature monitoring
 - Memory usage monitoring
 - Disk usage monitoring
-- Pi-hole service status
+- External storage detection
+- Pi-hole statistics (queries, blocked, percentage)
 - MinIO service status
 - WireGuard service status
+- Clickable service cards (quick access to web UIs)
 - Responsive dashboard layout
-- Modular service architecture for adding additional checks
+- Modular architecture (easy to add new services)
+
+## Services Supported
+
+- Pi-hole (API-based stats)
+- MinIO (service status)
+- WireGuard (service status)
+- System metrics (CPU, RAM, disk, uptime)
 
 ## Technologies Used
 
@@ -20,23 +29,34 @@ A lightweight dashboard for monitoring Raspberry Pi system health and homelab se
 - Express
 - HTML5
 - CSS3
-- JavaScript
+- JavaScript (ES Modules)
+- Fetch API
 - Linux systemd services
 
 ## Architecture
 
 The dashboard runs locally on a Raspberry Pi and gathers information from the operating system and installed services.
 
+Frontend is split into clear layers:
+
 ```text
 Browser
   ↓
+app.js (orchestrator)
+  ├── data.js (API calls)
+  └── ui.js (rendering)
+```
+
+Backend:
+
+```text
 Express Server
   ↓
 Service Modules
-  ├── System Metrics
-  ├── Pi-hole
-  ├── MinIO
-  └── WireGuard
+  ├── system.js
+  ├── pihole.js
+  ├── minio.js
+  └── wireguard.js
 ```
 
 ## Screenshot
@@ -52,7 +72,9 @@ pi-status-dashboard/
 ├── public/
 │   ├── index.html
 │   ├── styles.css
-│   └── app.js
+│   ├── app.js        # frontend entry point
+│   ├── data.js       # API/data layer
+│   └── ui.js         # rendering layer
 ├── scripts/
 │   ├── dev.sh
 │   └── prod.sh
@@ -61,10 +83,54 @@ pi-status-dashboard/
 │   ├── pihole.js
 │   ├── minio.js
 │   └── wireguard.js
-├── server.js
+├── server.js         # Express backend
 ├── package.json
 └── README.md
 ```
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create a `.env` file in the project root (required for certain services):
+
+```bash
+cp .env.example .env
+```
+
+If you don't have an example file, create one manually:
+
+```env
+# Pi-hole
+PIHOLE_URL=http://localhost
+PIHOLE_PASSWORD=your_password_here
+
+# Optional: Terminal access
+TERMINAL_URL=http://<raspberry-pi-ip>:7681
+```
+
+- `PIHOLE_PASSWORD` is required for fetching Pi-hole stats (v6 API requires authentication)
+- `TERMINAL_URL` is optional and enables the terminal button in the UI
+
+3. Start the server:
+
+```bash
+npm start
+```
+
+4. Open the dashboard in your browser:
+
+```text
+http://<raspberry-pi-ip>:3000
+```
+
+Ensure required services (Pi-hole, MinIO, WireGuard) are installed and running if you want their status to appear.
+
+> Note: If environment variables are missing or incorrect, some services (like Pi-hole) may show as unavailable in the dashboard.
 
 ## Notes
 

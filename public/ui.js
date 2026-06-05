@@ -1,5 +1,3 @@
-
-
 // UI layer: responsible only for rendering
 
 const statusGrid = document.getElementById("statusGrid");
