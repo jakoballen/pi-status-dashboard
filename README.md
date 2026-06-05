@@ -53,6 +53,9 @@ pi-status-dashboard/
 │   ├── index.html
 │   ├── styles.css
 │   └── app.js
+├── scripts/
+│   ├── dev.sh
+│   └── prod.sh
 ├── services/
 │   ├── system.js
 │   ├── pihole.js
@@ -62,13 +65,6 @@ pi-status-dashboard/
 ├── package.json
 └── README.md
 ```
-
-## Possible Future Improvements
-
-- Backup status monitoring
-- MinIO health endpoint checks
-- Pi-hole statistics integration
-- Additional homelab service checks
 
 ## Notes
 
