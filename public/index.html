@@ -8,13 +8,20 @@
   <script src="app.js" defer></script>
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Pi Status Dashboard</h1>
-      <p>Local status overview for Raspberry Pi services and system health.</p>
-    </div>
+<header>
+  <div>
+    <h1>Pi Status Dashboard</h1>
+    <p>Local status overview for Raspberry Pi services and system health.</p>
+  </div>
+
+  <div class="headerRight">
+    <button id="terminalBtn" class="terminalBtn">
+      Open Terminal
+    </button>
+
     <p id="lastUpdated">Last updated: Not yet checked</p>
-  </header>
+  </div>
+</header>
 
   <main>
     <section id="statusGrid" class="statusGrid" aria-label="System status cards">

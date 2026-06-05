@@ -5,6 +5,7 @@ const { getSystemStatus } = require("./services/system");
 const { getPiholeStatus } = require("./services/pihole");
 const { getMinioStatus } = require("./services/minio");
 const { getWireguardStatus } = require("./services/wireguard");
+const { getTerminalConfig } = require("./services/terminal");
 
 const app = express();
 const PORT = 3000;
@@ -27,6 +28,10 @@ app.get("/api/status", async (req, res) => {
         console.error(error);
         res.status(500).json({ error: "Failed to get status" });
     }
+});
+
+app.get("/api/terminal", (req, res) => {
+    res.json(getTerminalConfig());
 });
 
 app.listen(PORT, () => {

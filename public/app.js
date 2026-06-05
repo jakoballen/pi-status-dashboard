@@ -1,5 +1,34 @@
 const statusGrid = document.getElementById("statusGrid");
 const lastUpdated = document.getElementById("lastUpdated");
+const terminalBtn = document.getElementById("terminalBtn");
+
+let TERMINAL_URL = null;
+
+// -------------------- Config --------------------
+
+const SERVICE_LINKS = {
+    "Pi-hole": `${window.location.protocol}//${window.location.hostname}/admin`,
+    "MinIO": `${window.location.protocol}//${window.location.hostname}:9001`
+};
+
+const SYSTEM_TITLES = new Set([
+    "Pi Status",
+    "CPU Temperature",
+    "RAM Usage",
+    "Disk Usage",
+    "External Storage"
+]);
+
+const SYSTEM_ORDER = [
+    "Pi Status",
+    "CPU Temperature",
+    "RAM Usage",
+    "Disk Usage",
+    "External Storage"
+];
+
+// -------------------- Helpers --------------------
+
 function getIcon(title) {
     const icons = {
         "Pi Status": "🖥️",
@@ -15,14 +44,15 @@ function getIcon(title) {
     return icons[title] || "📊";
 }
 
-const SERVICE_LINKS = {
-    "Pi-hole": `${window.location.protocol}//${window.location.hostname}/admin`,
-    "MinIO": `${window.location.protocol}//${window.location.hostname}:9001`
-};
+function updateLastCheckedTime() {
+    const now = new Date();
+    lastUpdated.textContent = `Last updated: ${now.toLocaleString()} (auto-refresh every 30s)`;
+}
+
+// -------------------- UI --------------------
 
 function createStatusCard(item) {
     const card = document.createElement("article");
-    card.style.cursor = "default";
     card.className = "statusCard";
     card.classList.add(item.status || "neutral");
 
@@ -41,14 +71,16 @@ function createStatusCard(item) {
     card.appendChild(value);
     card.appendChild(detail);
 
+    // Clickable service cards
     const link = SERVICE_LINKS[item.title];
-
     if (link) {
         card.style.cursor = "pointer";
+
         const indicator = document.createElement("span");
         indicator.textContent = " ↗";
         indicator.style.opacity = "0.6";
         heading.appendChild(indicator);
+
         card.addEventListener("click", () => {
             window.open(link, "_blank");
         });
@@ -68,11 +100,6 @@ function createSection(title, items) {
     heading.style.fontSize = "1.25rem";
     heading.style.borderBottom = "1px solid #ccc";
     heading.style.paddingBottom = "0.25rem";
-
-    if (title === "System") {
-    wrapper.style.padding = "0.75rem";
-    wrapper.style.borderRadius = "8px";
-}
 
     const grid = document.createElement("div");
     grid.className = "statusGrid";
@@ -100,34 +127,18 @@ function renderStatusCards(statusItems) {
         return;
     }
 
-    const systemTitles = new Set([
-        "Pi Status",
-        "CPU Temperature",
-        "RAM Usage",
-        "Disk Usage",
-        "External Storage"
-    ]);
-
     const systemItems = [];
     const serviceItems = [];
 
     statusItems.forEach(item => {
-        if (systemTitles.has(item.title)) {
+        if (SYSTEM_TITLES.has(item.title)) {
             systemItems.push(item);
         } else {
             serviceItems.push(item);
         }
     });
 
-    const systemOrder = [
-        "Pi Status",
-        "CPU Temperature",
-        "RAM Usage",
-        "Disk Usage",
-        "External Storage"
-    ];
-
-    systemItems.sort((a, b) => systemOrder.indexOf(a.title) - systemOrder.indexOf(b.title));
+    systemItems.sort((a, b) => SYSTEM_ORDER.indexOf(a.title) - SYSTEM_ORDER.indexOf(b.title));
 
     if (systemItems.length > 0) {
         statusGrid.appendChild(createSection("System", systemItems));
@@ -138,9 +149,16 @@ function renderStatusCards(statusItems) {
     }
 }
 
-function updateLastCheckedTime() {
-    const now = new Date();
-    lastUpdated.textContent = `Last updated: ${now.toLocaleString()} (auto-refresh every 30s)`;
+// -------------------- Data --------------------
+
+async function loadTerminalConfig() {
+    try {
+        const res = await fetch("/api/terminal");
+        const data = await res.json();
+        TERMINAL_URL = data.terminalUrl;
+    } catch (err) {
+        console.error("Failed to load terminal config", err);
+    }
 }
 
 async function loadStatusData() {
@@ -169,8 +187,26 @@ async function loadStatusData() {
     }
 }
 
-loadStatusData();
+// -------------------- Init --------------------
 
-setInterval(() => {
+function setupTerminalButton() {
+    if (!terminalBtn) return;
+
+    terminalBtn.addEventListener("click", () => {
+        if (!TERMINAL_URL) {
+            console.error("TERMINAL_URL not loaded yet");
+            return;
+        }
+
+        window.open(TERMINAL_URL, "_blank");
+    });
+}
+
+async function init() {
+    await loadTerminalConfig();
+    setupTerminalButton();
     loadStatusData();
-}, 30000);
+    setInterval(loadStatusData, 30000);
+}
+
+init();
