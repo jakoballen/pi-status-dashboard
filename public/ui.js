@@ -5,7 +5,8 @@ const lastUpdated = document.getElementById("lastUpdated");
 
 const SERVICE_LINKS = {
     "Pi-hole": `${window.location.protocol}//${window.location.hostname}/admin`,
-    "MinIO": `${window.location.protocol}//${window.location.hostname}:9001`
+    "MinIO": `${window.location.protocol}//${window.location.hostname}:9001`,
+    "qBittorrent": `${window.location.protocol}//${window.location.hostname}:8080`
 };
 
 const SYSTEM_TITLES = new Set([

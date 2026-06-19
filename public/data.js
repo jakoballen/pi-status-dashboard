@@ -1,5 +1,3 @@
-
-
 // Data layer: responsible only for fetching data from the API
 
 export async function loadTerminalConfig() {

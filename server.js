@@ -6,6 +6,7 @@ const { getPiholeStatus } = require("./services/pihole");
 const { getMinioStatus } = require("./services/minio");
 const { getWireguardStatus } = require("./services/wireguard");
 const { getTerminalConfig } = require("./services/terminal");
+const { getQbittorrentStatus } = require("./services/qbittorrent");
 
 const app = express();
 const PORT = 3000;
@@ -20,7 +21,8 @@ app.get("/api/status", async (req, res) => {
             ...systemStatus,
             await getPiholeStatus(),
             await getMinioStatus(),
-            await getWireguardStatus()
+            await getWireguardStatus(),
+            await getQbittorrentStatus()
         ];
 
         res.json(statuses);
